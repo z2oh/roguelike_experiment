@@ -11,14 +11,16 @@ mod gfx;
 mod state;
 mod util;
 
+use gfx::prelude::*;
+
 async fn run(event_loop: EventLoop<()>, window: Window) {
     env_logger::init();
 
     let mut world = state::world::World::new();
 
     // Initialize the gfx context.
-    let mut gfx_context = crate::gfx::GfxContext::create(&window).await.unwrap();
-    let mut world_renderer = crate::gfx::world_renderer::WorldRenderer::new(world.id);
+    let mut gfx_context = GfxContext::create(&window).await.unwrap();
+    let mut world_renderer = WorldRenderer::new(world.id);
 
     // Start focused by default, assuming the application was executed with the intention of using
     // it straight away.

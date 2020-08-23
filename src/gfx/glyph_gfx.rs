@@ -3,6 +3,8 @@
 //! does not need to be recaptured. All non-stateful graphical elements (animations, etc.) are
 //! captured by the types in this module.
 
+use crate::gfx::prelude::*;
+
 pub struct GfxGlyph {
     pub glyph: &'static str,
     pub render_offset: [f32; 2],
