@@ -72,12 +72,19 @@ pub struct World {
 }
 
 impl World {
-    // TODO: Remove camera as parameter; this is only here so we can generate a debug map that fills
-    // the screen.
-    pub fn new(camera: &crate::gfx::camera::Camera) -> Self {
+    pub fn new() -> Self {
+        // TODO: Remove this camera; this is only here so we can generate a debug map that fills
+        // the screen.
+        let camera = crate::gfx::camera::Camera {
+            world_offset: (0, 0, 0),
+            region_offset: (0, 0),
+            // TODO: Assuming glyph size of (10, 20) and window size of (1280, 720).
+            tiles_dims: (128, 36),
+        };
+
         Self {
             id: WorldId(0),
-            regions: DEBUG_gen_regions(camera),
+            regions: DEBUG_gen_regions(&camera),
             current_tick: Tick(1),
         }
     }

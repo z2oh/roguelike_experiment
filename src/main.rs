@@ -14,14 +14,7 @@ mod util;
 async fn run(event_loop: EventLoop<()>, window: Window) {
     env_logger::init();
 
-    let camera = gfx::camera::Camera {
-        world_offset: (0, 0, 0),
-        region_offset: (0, 0),
-        // TODO: Assuming glyph size of (10, 20) and window size of (1280, 720).
-        tiles_dims: (128, 36),
-    };
-
-    let mut world = state::world::World::new(&camera);
+    let mut world = state::world::World::new();
 
     // Initialize the gfx context.
     let mut gfx_context = crate::gfx::GfxContext::create(&window).await.unwrap();
@@ -36,7 +29,7 @@ async fn run(event_loop: EventLoop<()>, window: Window) {
         match event {
             Event::MainEventsCleared => window.request_redraw(),
             Event::RedrawRequested(_) =>
-                gfx_context.render(&mut world, &mut world_renderer, &camera),
+                gfx_context.render(&mut world, &mut world_renderer),
             Event::WindowEvent { event: WindowEvent::Resized(size), .. } =>
                 gfx_context.resize(size),
             // Handle requests to close the window...

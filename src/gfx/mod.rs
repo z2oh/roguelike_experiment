@@ -45,11 +45,10 @@ impl GfxContext {
         &mut self,
         world: &mut crate::state::world::World,
         world_renderer: &mut world_renderer::WorldRenderer,
-        camera: &camera::Camera,
     ) {
         let frame = self.gpu_context.get_next_frame().unwrap();
 
-        world_renderer.render(world, camera, &mut self.monospace_glyph_context);
+        world_renderer.render(world, &mut self.monospace_glyph_context);
 
         let (width, height) = self.gpu_context.size();
 

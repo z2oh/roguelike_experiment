@@ -19,16 +19,25 @@ pub struct WorldRenderer {
     world_id: WorldId,
     render_modifiers: HashSet<RenderModifier>,
     render_cache: HashMap<(i32, i32, i32), CachedRegion>,
+    camera: gfx::camera::Camera,
 }
 
 const OFF_SCREEN_RENDER_HEURISTIC: i32 = 2;
 
 impl WorldRenderer {
     pub fn new(world_id: WorldId) -> Self {
+        let camera = gfx::camera::Camera {
+            world_offset: (0, 0, 0),
+            region_offset: (0, 0),
+            // TODO: Assuming glyph size of (10, 20) and window size of (1280, 720).
+            tiles_dims: (128, 36),
+        };
+
         Self {
             world_id,
             render_modifiers: HashSet::new(),
             render_cache: HashMap::new(),
+            camera,
         }
     }
 
@@ -36,15 +45,14 @@ impl WorldRenderer {
         &mut self,
         // TODO: Separate the world from the cache so that we don't need a mutable handle to the world.
         world: &mut World,
-        camera: &gfx::camera::Camera,
         glyph_context: &mut gfx::glyph_context::MonospaceGlyphContext,
     ) {
         assert!(self.world_id == world.id,
             "World renderer called with a different world than the one with which is was initialized.");
 
-        // TODO: All this logic should be in the camera, probably.
-        let (base_region_x, base_region_y, z) = camera.world_offset;
-        let (render_size_x, render_size_y) = camera.tiles_dims;
+        // TODO: All this logic should be in the camera. probably.
+        let (base_region_x, base_region_y, z) = self.camera.world_offset;
+        let (render_size_x, render_size_y) = self.camera.tiles_dims;
 
         let regions_wide = ((render_size_x / REGION_DIM as u32) + 1) as i32;
         let regions_tall = ((render_size_y / REGION_DIM as u32) + 1) as i32;
@@ -57,7 +65,7 @@ impl WorldRenderer {
 
         for y in base_y..final_y {
             for x in base_x..final_x {
-                self.render_offset(world, camera, glyph_context, (x, y, z));
+                self.render_offset(world, glyph_context, (x, y, z));
             }
         }
     }
@@ -65,18 +73,17 @@ impl WorldRenderer {
     fn render_offset(
         &mut self,
         world: &mut World,
-        camera: &gfx::camera::Camera,
         glyph_context: &mut gfx::glyph_context::MonospaceGlyphContext,
         offset: (i32, i32, i32),
     ) {
-        let region = &self.get_cached_region(world, offset).region;
+        let (tile_x, tile_y) = self.camera.get_screen_coords(offset);
 
-        let (camera_tile_x, camera_tile_y) = camera.get_screen_coords(offset);
+        let region = &self.get_cached_region(world, offset).region;
 
         let mut section = wgpu_glyph::Section {
             screen_position: (
-                camera_tile_x as f32 * glyph_context.glyph_width,
-                camera_tile_y as f32 * glyph_context.glyph_height,
+                tile_x as f32 * glyph_context.glyph_width,
+                tile_y as f32 * glyph_context.glyph_height,
             ),
             ..wgpu_glyph::Section::default()
         };
