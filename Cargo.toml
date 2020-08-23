@@ -10,6 +10,6 @@ edition = "2018"
 env_logger = "0.7"
 futures = "0.3"
 rand = "0.7"
-wgpu = "0.5"
-wgpu_glyph = "0.9"
+wgpu = "0.6"
+wgpu_glyph = { git = "https://github.com/hecrj/wgpu_glyph/", rev = "a2ca593147b416ef99fa573198edb692dfaee07e"}
 winit = "0.22"

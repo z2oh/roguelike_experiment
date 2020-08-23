@@ -25,7 +25,7 @@ impl GfxContext {
         let init_encoder = gpu_context.create_command_encoder();
 
         // Flush the initialization commands on the command queue.
-        gpu_context.queue().submit(&[init_encoder.finish()]);
+        gpu_context.queue().submit(Some(init_encoder.finish()));
 
         let next_frame_encoder = gpu_context.create_command_encoder();
 
@@ -56,7 +56,7 @@ impl GfxContext {
         self.monospace_glyph_context.glyph_context.glyph_brush.draw_queued(
             self.gpu_context.device(),
             &mut self.next_frame_encoder,
-            &frame.view,
+            &frame.output.view,
             width,
             height,
         ).unwrap();
